@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<script>
+var ffi = require('ffi');
+//路径不用.dylib后缀
+
+var ffi = require('ffi');
+var libdemo = ffi.Library('./native/libdemo', {
+  'Add': [ 'double', [ 'double', 'double'] ] ,
+  'setCallback':['void',['pointer']]
+});
+
+//js的回调函数，调用C++ 的Add 函数时会触发
+var callback = ffi.Callback( 'void',['int','string'] ,function (id, name){
+	console.log("id:",id);
+	console.log("name",name);
+});
+
+console.log("registering the callback ");
+libdemo.setCallback( callback );
+
+window.onload = function() {
+    console.log(libdemo.Add(12345, 54321));
+}
+
+process.on('exit',function(){
+//callback函数要引用一下
+callback
+});
+</script>
+</html>
